@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-sabah-blue: #3B82F6;
+  --color-emerald: #10B981;
+  --color-warm-amber: #F59E0B;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+:root {
+  --background: #f0f4f8;
+  --foreground: #0f172a;
+}
+
+[data-theme="emerald"] {
+  --color-blue-50: #ecfdf5;
+  --color-blue-100: #d1fae5;
+  --color-blue-200: #a7f3d0;
+  --color-blue-300: #6ee7b7;
+  --color-blue-400: #34d399;
+  --color-blue-500: #10b981;
+  --color-blue-600: #059669;
+  --color-blue-700: #047857;
+  --color-blue-800: #065f46;
+  --color-blue-900: #064e3b;
+  --color-indigo-400: #2dd4bf;
+  --color-indigo-500: #14b8a6;
+  --color-indigo-600: #0d9488;
+  --color-indigo-700: #0f766e;
+}
+
+[data-theme="rose"] {
+  --color-blue-50: #fff1f2;
+  --color-blue-100: #ffe4e6;
+  --color-blue-200: #fecdd3;
+  --color-blue-300: #fda4af;
+  --color-blue-400: #fb7185;
+  --color-blue-500: #f43f5e;
+  --color-blue-600: #e11d48;
+  --color-blue-700: #be123c;
+  --color-blue-800: #9f1239;
+  --color-blue-900: #881337;
+  --color-indigo-400: #f472b6;
+  --color-indigo-500: #ec4899;
+  --color-indigo-600: #db2777;
+  --color-indigo-700: #be185d;
+}
+
+[data-theme="amber"] {
+  --color-blue-50: #fffbeb;
+  --color-blue-100: #fef3c7;
+  --color-blue-200: #fde68a;
+  --color-blue-300: #fcd34d;
+  --color-blue-400: #fbbf24;
+  --color-blue-500: #f59e0b;
+  --color-blue-600: #d97706;
+  --color-blue-700: #b45309;
+  --color-blue-800: #92400e;
+  --color-blue-900: #78350f;
+  --color-indigo-400: #fb923c;
+  --color-indigo-500: #f97316;
+  --color-indigo-600: #ea580c;
+  --color-indigo-700: #c2410c;
+}
+
+[data-theme="violet"] {
+  --color-blue-50: #f5f3ff;
+  --color-blue-100: #ede9fe;
+  --color-blue-200: #ddd6fe;
+  --color-blue-300: #c4b5fd;
+  --color-blue-400: #a78bfa;
+  --color-blue-500: #8b5cf6;
+  --color-blue-600: #7c3aed;
+  --color-blue-700: #6d28d9;
+  --color-blue-800: #5b21b6;
+  --color-blue-900: #4c1d95;
+  --color-indigo-400: #e879f9;
+  --color-indigo-500: #d946ef;
+  --color-indigo-600: #c026d3;
+  --color-indigo-700: #a21caf;
+}
+
+[data-bg-theme="light"] {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+[data-bg-theme="dark"] {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+}
+[data-bg-theme="grey"] {
+  --background: #334155;
+  --foreground: #f8fafc;
+}
+[data-bg-theme="neon"] {
+  --background: #050505;
+  --foreground: #39ff14;
+}
+[data-bg-theme="bright"] {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  @apply backdrop-blur-xl bg-white/65 border border-white/50 shadow-xl transition-colors;
+}
+
+:is(.dark .glass-panel) {
+  @apply bg-slate-900/40 border-slate-700/50;
+}
+
+/* Ambient Mesh Gradient Background Blobs */
+.mesh-blob {
+  @apply absolute rounded-full mix-blend-multiply filter blur-3xl opacity-70 transition-colors;
+  animation: blob 7s infinite;
+}
+
+:is(.dark .mesh-blob) {
+  @apply mix-blend-screen opacity-40;
+}
+
+[data-bg-theme="neon"] .mesh-blob {
+  background: #39ff14 !important;
+  opacity: 0.15 !important;
+}
+
+[data-bg-theme="grey"] .mesh-blob,
+[data-bg-theme="bright"] .mesh-blob {
+  display: none !important;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+  }
+  .no-print, nav, aside {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 11pt !important;
+  }
+  .print-table th, .print-table td {
+    border: 1px solid #000 !important;
+    padding: 6px !important;
+    color: black !important;
+    background: transparent !important;
+  }
+  .print-table th {
+    background-color: #f3f4f6 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

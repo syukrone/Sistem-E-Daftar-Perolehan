@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  staff
+  ppkp
+  pptk
+  admin
+}
+
+enum DocumentStatus {
+  pending_review
+  ready_for_assignment
+  in_progress
+  closed
+}
+
+model User {
+  id                    BigInt              @id @default(autoincrement())
+  name                  String              @db.VarChar(255)
+  email                 String              @unique @db.VarChar(255)
+  password              String              @db.VarChar(255)
+  role                  Role                @default(staff)
+  createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamp(0)
+  isActive              Boolean             @default(true) @map("is_active")
+  
+  // Relations
+  assignedDocuments     Document[]          @relation("AssignedTo")
+  createdDocuments      Document[]          @relation("CreatedBy")
+  procurementUpdates    ProcurementUpdate[]
+  arkibDocuments        ArkibDocument[]
+
+  @@map("users")
+}
+
+model Category {
+  id           Int        @id @default(autoincrement())
+  categoryName String     @map("category_name") @db.VarChar(255)
+  
+  // Relations
+  documents    Document[]
+
+  @@map("categories")
+}
+
+model Document {
+  id                  BigInt            @id @default(autoincrement())
+  tarikhTerima        DateTime          @map("tarikh_terima") @db.Date
+  bahagianMemohon     String            @map("bahagian_memohon") @db.VarChar(255)
+  noRujukanFail       String            @map("no_rujukan_fail") @db.VarChar(255)
+  rujukanPekeliling   String?           @map("rujukan_pekeliling") @db.VarChar(255)
+  tarikhRujukanFail   DateTime?         @map("tarikh_rujukan_fail") @db.Date
+  tajuk               String            @db.Text
+  categoryId          Int               @map("category_id")
+  status              DocumentStatus    @default(pending_review)
+  reviewPpkp          Boolean           @default(false) @map("review_ppkp")
+  reviewPpkpAt        DateTime?         @map("review_ppkp_at") @db.Timestamp(0)
+  reviewPptk          Boolean           @default(false) @map("review_pptk")
+  reviewPptkAt        DateTime?         @map("review_pptk_at") @db.Timestamp(0)
+  catatanPpkp         String?           @map("catatan_ppkp") @db.Text
+  catatanPptk         String?           @map("catatan_pptk") @db.Text
+  assignedToUserId    BigInt?           @map("assigned_to_user_id")
+  createdByUserId     BigInt            @map("created_by_user_id")
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  category            Category          @relation(fields: [categoryId], references: [id])
+  assignedToUser      User?             @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  createdByUser       User              @relation("CreatedBy", fields: [createdByUserId], references: [id])
+  procurementUpdates  ProcurementUpdate[]
+
+  @@map("documents")
+}
+
+model ProcurementUpdate {
+  id                   BigInt    @id @default(autoincrement())
+  documentId           BigInt    @map("document_id")
+  noPesananKerajaan    String?   @map("no_pesanan_kerajaan") @db.VarChar(255)
+  namaPembekal         String?   @map("nama_pembekal") @db.VarChar(255)
+  amaun                Decimal?  @db.Decimal(12, 2)
+  noInvois             String?   @map("no_invois") @db.VarChar(255)
+  tarikhHantarAkaun    DateTime? @map("tarikh_hantar_akaun") @db.Date
+  catatan              String?   @db.Text
+  metadata             Json?     @db.Json
+  updatedByUserId      BigInt    @map("updated_by_user_id")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  document             Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  updatedByUser        User      @relation(fields: [updatedByUserId], references: [id])
+
+  @@map("procurement_updates")
+}
+
+model ArkibDocument {
+  id                Int       @id @default(autoincrement())
+  title             String    @db.VarChar(255)
+  reference         String    @db.VarChar(255)
+  publishDate       DateTime  @map("publish_date") @db.Date
+  fileUrl           String    @map("file_url") @db.Text
+  uploadedByUserId  BigInt    @map("uploaded_by_user_id")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+
+  uploadedByUser    User      @relation(fields: [uploadedByUserId], references: [id])
+
+  @@map("arkib_documents")
+}
